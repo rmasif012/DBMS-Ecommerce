@@ -1,0 +1,278 @@
+create DATABASE ecommerce_clothing;
+use ecommerce_clothing;
+CREATE TABLE Customer (
+    CustomerID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    ContactNumber VARCHAR(20),
+    ShippingAddress VARCHAR(255)
+);
+CREATE TABLE Seller (
+    SellerID INT AUTO_INCREMENT PRIMARY KEY,
+    CompanyName VARCHAR(255) NOT NULL,
+    ContactName VARCHAR(255) NOT NULL,
+    Email VARCHAR(255) UNIQUE NOT NULL,
+    Password VARCHAR(255) NOT NULL,
+    ContactNumber VARCHAR(20),
+    CompanyAddress VARCHAR(255)
+);
+CREATE TABLE Product (
+    ProductID INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    Description TEXT,
+    Price DECIMAL(10, 2) NOT NULL,
+    StockLevel INT NOT NULL,
+    Category VARCHAR(255),
+    Brand VARCHAR(255),
+    Size VARCHAR(20),
+    Color VARCHAR(50)
+);
+CREATE TABLE _Order (
+    OrderID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT,
+    SellerID INT,
+    OrderDate DATETIME NOT NULL,
+    TotalCost DECIMAL(10, 2) NOT NULL,
+    ShippingDetails VARCHAR(255),
+    OrderStatus VARCHAR(50) NOT NULL,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
+    FOREIGN KEY (SellerID) REFERENCES Seller(SellerID)
+);
+CREATE TABLE _Transaction (
+    TransactionID INT AUTO_INCREMENT PRIMARY KEY,
+    OrderID INT UNIQUE,
+    PaymentMethod VARCHAR(50) NOT NULL,
+    Amount DECIMAL(10, 2) NOT NULL,
+    TransactionStatus VARCHAR(50) NOT NULL,
+    FOREIGN KEY (OrderID) REFERENCES _Order(OrderID)
+);
+CREATE TABLE Inventory (
+    ProductID INT,
+    SellerID INT,
+    StockLevel INT NOT NULL,
+    PRIMARY KEY (ProductID, SellerID),
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+    FOREIGN KEY (SellerID) REFERENCES Seller(SellerID)
+);
+CREATE TABLE CustomerInteraction (
+    InteractionID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT,
+    InteractionType VARCHAR(50) NOT NULL,
+    InteractionDate DATETIME NOT NULL,
+    InteractionDetails TEXT,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+CREATE TABLE SellerInteraction (
+    InteractionID INT AUTO_INCREMENT PRIMARY KEY,
+    SellerID INT,
+    InteractionType VARCHAR(50) NOT NULL,
+    InteractionDate DATETIME NOT NULL,
+    InteractionDetails TEXT,
+    FOREIGN KEY (SellerID) REFERENCES Seller(SellerID)
+);
+CREATE TABLE Analytics (
+    AnalyticsID INT AUTO_INCREMENT PRIMARY KEY,
+    Date DATE NOT NULL,
+    UserActivity TEXT,
+    SalesData TEXT,
+    WebsitePerformanceMetrics TEXT
+);
+
+INSERT INTO Customer (Name, Email, Password, ContactNumber, ShippingAddress) VALUES
+('John Doe', 'john@gmail.com', 'password123', '1234567890', '123 Main St, City, Country'),
+('Alice Smith', 'alicesm2@yahoo.com', 'securepass', '9876543210', '456 Oak Ave, Town, Country'),
+('Bob Johnson', 'bobby@gmail.com', 'bobpass', '5551234567', '789 Elm St, Village, Country'),
+('Emma Brown', 'emma@gmail.com.com', 'emmapass', '7778889999', '321 Pine Rd, Hamlet, Country'),
+('Michael Davis', 'michael@yahoo.com', 'michaelpass', '1112223333', '654 Cedar St, Suburb, Country'),
+('Sarah Wilson', 'sarah@gmail.com', 'sarahpass', '4445556666', '987 Birch Ave, City, Country'),
+('David Lee', 'david@gmail.com', 'davidpass', '9990001111', '147 Willow Rd, Town, Country'),
+('Jennifer Taylor', 'jennifer@gmail.com', 'jenniferpass', '3334445555', '258 Maple St, Village, Country'),
+('Chris Evans', 'chris@gmail.com', 'chrispass', '6667778888', '369 Oak Ln, Hamlet, Country'),
+('Laura Martinez', 'laura@yahoo.com', 'laurapass', '8889990000', '741 Elm Ave, Suburb, Country');
+
+INSERT INTO Seller (CompanyName, ContactName, Email, Password, ContactNumber, CompanyAddress) VALUES
+('ABC Clothing', 'John Smith', 'abc@example.com', 'abcpass', '1234567890', '123 Main St, City, Country'),
+('chinatown Fashion', 'Alice Johnson', 'xyz@example.com', 'xyzpass', '9876543210', '456 Oak Ave, Town, Country'),
+('Fashion World', 'Bob Brown', 'fashion@example.com', 'fashionpass', '5551234567', '789 Elm St, Village, Country'),
+('Trendy Apparel', 'Emma Davis', 'trendy@example.com', 'trendypass', '7778889999', '321 Pine Rd, Hamlet, Country'),
+('StyleMart', 'Michael Wilson', 'style@example.com', 'stylepass', '1112223333', '654 Cedar St, Suburb, Country'),
+('Chica Boutique', 'Sarah Lee', 'chic@example.com', 'chicpass', '4445556666', '987 Birch Ave, City, Country');
+
+-- Inserting information into the Product table
+INSERT INTO Product (Name, Description, Price, StockLevel, Category, Brand, Size, Color) VALUES
+('Classic White T-Shirt', 'A comfortable cotton t-shirt in classic white color.', 19.99, 50, 'Clothing', 'ABC Apparel', 'M', 'White'),
+('Slim Fit Blue Jeans', 'Stylish slim-fit jeans made from durable denim material.', 39.99, 30, 'Clothing', 'XYZ Denim', '32W x 32L', 'Blue'),
+('Sporty Sneakers', 'Trendy sneakers perfect for sports and casual wear.', 49.99, 40, 'Footwear', 'Trendy Kicks', '10', 'Black'),
+('Cozy Hooded Sweatshirt', 'Warm and comfortable hooded sweatshirt for chilly days.', 29.99, 20, 'Clothing', 'Fashion Co.', 'L', 'Gray'),
+('Classic Leather Belt', 'Genuine leather belt with a timeless design.', 24.99, 60, 'Accessories', 'StyleMart', 'One Size', 'Brown'),
+('Denim Jacket', 'Fashionable denim jacket with a modern fit.', 59.99, 25, 'Clothing', 'XYZ Denim', 'XL', 'Blue'),
+('Casual Plaid Shirt', 'Stylish plaid shirt suitable for everyday casual wear.', 34.99, 35, 'Clothing', 'ABC Apparel', 'L', 'Red'),
+('Formal Dress Shirt', 'Elegant dress shirt suitable for formal occasions.', 44.99, 30, 'Clothing', 'Fashion Co.', 'M', 'White'),
+('Classic Leather Handbag', 'Chic leather handbag with multiple compartments.', 79.99, 15, 'Accessories', 'Chic Boutique', 'One Size', 'Black'),
+('Running Shoes', 'High-performance running shoes with advanced cushioning.', 69.99, 20, 'Footwear', 'Trendy Kicks', '9', 'Gray'),
+('Retro Sunglasses', 'Vintage-style sunglasses with UV protection lenses.', 29.99, 45, 'Accessories', 'StyleMart', 'One Size', 'Black'),
+('Cozy Flannel Pajamas', 'Soft flannel pajamas for a comfortable night\'s sleep.', 49.99, 10, 'Clothing', 'XYZ Sleepwear', 'XL', 'Plaid'),
+('Leather jacket', 'Slim and durable leather jacket with multiple card slots.', 39.99, 30, 'Accessories', 'Chic Boutique', 'One Size', 'Brown'),
+('Stylish Fedora Hat', 'Classic fedora hat made from high-quality wool felt.', 34.99, 25, 'Accessories', 'StyleMart', 'One Size', 'Black'),
+('Formal Necktie', 'Silk necktie perfect for adding a touch of elegance to any outfit.', 19.99, 50, 'Accessories', 'Fashion Co.', 'One Size', 'Navy'),
+('Slim Fit Chinos', 'Modern slim-fit chinos crafted from breathable cotton.', 49.99, 20, 'Clothing', 'ABC Apparel', '34W x 32L', 'Khaki'),
+('Canvas Backpack', 'Sturdy canvas backpack with multiple pockets for organization.', 59.99, 15, 'Accessories', 'Chic Boutique', 'One Size', 'Gray'),
+('Cozy Knit Sweater', 'Warm and soft knit sweater perfect for layering in colder weather.', 54.99, 20, 'Clothing', 'XYZ Knitwear', 'S', 'Navy'),
+('Elegant Pearl Necklace', 'Timeless pearl necklace with a delicate silver chain.', 89.99, 10, 'Accessories', 'Chic Boutique', 'One Size', 'White'),
+('Classic Leather jacket', 'Sophisticated leather jacket suitable for both casual and formal occasions.', 79.99, 15, 'Footwear', 'StyleMart', '11', 'Brown');
+
+-- Inserting information into the _Order table
+INSERT INTO _Order (CustomerID, SellerID, OrderDate, TotalCost, ShippingDetails, OrderStatus) VALUES
+(1, 1, '2024-05-15 10:00:00', 99.99, '123 Main St, City, Country', 'Pending'),
+(2, 2, '2024-05-16 11:30:00', 149.99, '456 Oak Ave, Town, Country', 'Processing'),
+(3, 3, '2024-05-17 12:45:00', 79.99, '789 Elm St, Village, Country', 'Shipped'),
+(4, 4, '2024-05-18 09:15:00', 199.99, '321 Pine Rd, Hamlet, Country', 'Delivered'),
+(5, 5, '2024-05-19 08:00:00', 59.99, '654 Cedar St, Suburb, Country', 'Pending'),
+(6, 6, '2024-05-20 13:20:00', 129.99, '987 Birch Ave, City, Country', 'Processing'),
+(7, 1, '2024-05-21 14:30:00', 89.99, '123 Main St, City, Country', 'Shipped'),
+(8, 2, '2024-05-22 15:45:00', 179.99, '456 Oak Ave, Town, Country', 'Delivered'),
+(9, 3, '2024-05-23 16:00:00', 69.99, '789 Elm St, Village, Country', 'Pending'),
+(10, 4, '2024-05-24 17:10:00', 249.99, '321 Pine Rd, Hamlet, Country', 'Processing');
+
+-- Inserting information into the Transaction table
+INSERT INTO _Transaction (OrderID, PaymentMethod, Amount, TransactionStatus) VALUES
+(1, 'Credit Card', 99.99, 'Completed'),
+(2, 'PayPal', 149.99, 'Completed'),
+(3, 'Cash on Delivery', 79.99, 'Processing'),
+(4, 'Credit Card', 199.99, 'Completed'),
+(5, 'Credit Card', 59.99, 'Completed'),
+(6, 'PayPal', 129.99, 'Processing'),
+(7, 'Credit Card', 89.99, 'Completed'),
+(8, 'PayPal', 179.99, 'Processing'),
+(9, 'Credit Card', 69.99, 'Completed'),
+(10, 'Cash on Delivery', 249.99, 'Processing'),
+(11, 'Credit Card', 39.99, 'Completed'),
+(12, 'PayPal', 149.99, 'Completed'),
+(13, 'Credit Card', 109.99, 'Processing'),
+(14, 'Credit Card', 199.99, 'Completed'),
+(15, 'PayPal', 59.99, 'Completed'),
+(16, 'Credit Card', 279.99, 'Processing'),
+(17, 'Credit Card', 79.99, 'Completed'),
+(18, 'PayPal', 169.99, 'Processing'),
+(19, 'Credit Card', 129.99, 'Completed'),
+(20, 'Credit Card', 219.99, 'Completed'),
+(21, 'PayPal', 99.99, 'Processing'),
+(22, 'Credit Card', 299.99, 'Completed'),
+(23, 'Credit Card', 99.99, 'Processing'),
+(24, 'PayPal', 189.99, 'Completed'),
+(25, 'Credit Card', 149.99, 'Completed');
+
+-- Inserting information into the Inventory table
+INSERT INTO Inventory (ProductID, SellerID, StockLevel) VALUES
+(1, 1, 100),
+(2, 2, 80),
+(3, 3, 120),
+(4, 4, 50),
+(5, 5, 70),
+(6, 6, 90),
+(7, 1, 60),
+(8, 2, 40),
+(9, 3, 110),
+(10, 4, 30),
+(11, 5, 80),
+(12, 6, 20),
+(13, 1, 70),
+(14, 2, 90),
+(15, 3, 40),
+(16, 4, 60),
+(17, 5, 100),
+(18, 6, 25),
+(19, 1, 45),
+(20, 2, 75);
+
+-- Inserting information into the CustomerInteraction table
+INSERT INTO CustomerInteraction (CustomerID, InteractionType, InteractionDate, InteractionDetails) VALUES
+(1, 'Feedback', '2024-05-15 10:00:00', 'Provided positive feedback on recent purchase.'),
+(2, 'Support', '2024-05-16 11:30:00', 'Requested assistance with order tracking.'),
+(3, 'Review', '2024-05-17 12:45:00', 'Left a 5-star review for the product.'),
+(4, 'Feedback', '2024-05-18 09:15:00', 'Expressed satisfaction with customer service.'),
+(5, 'Support', '2024-05-19 08:00:00', 'Inquired about product availability.'),
+(6, 'Feedback', '2024-05-20 13:20:00', 'Suggested improvement for website layout.'),
+(7, 'Review', '2024-05-21 14:30:00', 'Shared detailed review including product pros and cons.'),
+(8, 'Feedback', '2024-05-22 15:45:00', 'Requested additional product information.'),
+(9, 'Support', '2024-05-23 16:00:00', 'Reported an issue with order delivery.'),
+(10, 'Feedback', '2024-05-24 17:10:00', 'Provided feedback on product packaging.'),
+(1, 'Support', '2024-05-25 18:20:00', 'Asked for assistance with account login.'),
+(2, 'Feedback', '2024-05-26 19:30:00', 'Suggested new product ideas.'),
+(3, 'Review', '2024-05-27 20:45:00', 'Left a detailed review with photos.'),
+(4, 'Feedback', '2024-05-28 21:00:00', 'Requested faster shipping options.'),
+(5, 'Support', '2024-05-29 22:15:00', 'Inquired about return policy.'),
+(6, 'Feedback', '2024-05-30 23:30:00', 'Suggested improvement for customer support.'),
+(7, 'Review', '2024-05-31 09:45:00', 'Left a review highlighting product quality.'),
+(8, 'Feedback', '2024-06-01 10:00:00', 'Requested more color options for a product.'),
+(9, 'Support', '2024-06-02 11:15:00', 'Asked for assistance with order modification.'),
+(10, 'Feedback', '2024-06-03 12:30:00', 'Provided feedback on website navigation.');
+
+-- Inserting information into the SellerInteraction table
+INSERT INTO SellerInteraction (SellerID, InteractionType, InteractionDate, InteractionDetails) VALUES
+(1, 'Feedback', '2024-05-15 10:00:00', 'Received positive feedback from a customer.'),
+(2, 'Support', '2024-05-16 11:30:00', 'Assisted a customer with product inquiries.'),
+(3, 'Review', '2024-05-17 12:45:00', 'Received a 5-star review for a product.'),
+(4, 'Feedback', '2024-05-18 09:15:00', 'Addressed a customer complaint.'),
+(5, 'Support', '2024-05-19 08:00:00', 'Provided guidance on order fulfillment.'),
+(6, 'Feedback', '2024-05-20 13:20:00', 'Suggested improvements for website navigation.'),
+(1, 'Support', '2024-05-21 14:30:00', 'Resolved a customers issue with their order.'),
+(2, 'Feedback', '2024-05-22 15:45:00', 'Received suggestions for new product ideas.'),
+(3, 'Review', '2024-05-23 16:00:00', 'Received a detailed review with photos.'),
+(4, 'Feedback', '2024-05-24 17:10:00', 'Addressed concerns about shipping times.'),
+(5, 'Support', '2024-05-25 18:20:00', 'Assisted with returns and exchanges.'),
+(6, 'Feedback', '2024-05-26 19:30:00', 'Received feedback on product packaging.'),
+(1, 'Support', '2024-05-27 20:45:00', 'Provided technical support for a product.'),
+(2, 'Feedback', '2024-05-28 21:00:00', 'Received feedback on customer service experience.'),
+(3, 'Review', '2024-05-29 22:15:00', 'Received a review highlighting product quality.'),
+(4, 'Feedback', '2024-05-30 23:30:00', 'Addressed concerns about product pricing.'),
+(5, 'Support', '2024-05-31 09:45:00', 'Assisted with order cancellations.'),
+(6, 'Feedback', '2024-06-01 10:00:00', 'Received feedback on website layout.'),
+(1, 'Support', '2024-06-02 11:15:00', 'Assisted with account management.'),
+(2, 'Feedback', '2024-06-03 12:30:00', 'Received feedback on product descriptions.');
+
+-- Inserting information into the Analytics table
+INSERT INTO Analytics (Date, UserActivity, SalesData, WebsitePerformanceMetrics) VALUES
+('2024-05-01', 'Logged in, viewed product A, added product B to cart, checked out', 'Total sales: $10000', 'Average page load time: 2.5 seconds, Conversion rate: 3%'),
+('2024-05-02', 'Logged in, viewed product C, added product D to wishlist, viewed product E', 'Total sales: $12000', 'Average page load time: 2.6 seconds, Conversion rate: 2.8%'),
+('2024-05-03', 'Logged in, searched for product F, viewed product G, added product H to cart, checked out', 'Total sales: $9500', 'Average page load time: 2.7 seconds, Conversion rate: 3.2%'),
+('2024-05-04', 'Logged in, viewed product I, added product J to cart, viewed product K', 'Total sales: $11000', 'Average page load time: 2.4 seconds, Conversion rate: 3.5%'),
+('2024-05-05', 'Logged in, viewed product L, added product M to cart, viewed product N', 'Total sales: $10500', 'Average page load time: 2.8 seconds, Conversion rate: 3.1%'),
+('2024-05-06', 'Logged in, viewed product O, added product P to cart, checked out', 'Total sales: $13000', 'Average page load time: 2.3 seconds, Conversion rate: 3.8%'),
+('2024-05-07', 'Logged in, viewed product Q, added product R to cart, viewed product S', 'Total sales: $11500', 'Average page load time: 2.6 seconds, Conversion rate: 3.4%'),
+('2024-05-08', 'Logged in, viewed product T, added product U to cart, checked out', 'Total sales: $14000', 'Average page load time: 2.5 seconds, Conversion rate: 3.6%'),
+('2024-05-09', 'Logged in, viewed product V, added product W to cart, viewed product X', 'Total sales: $12500', 'Average page load time: 2.7 seconds, Conversion rate: 3.2%'),
+('2024-05-10', 'Logged in, viewed product Y, added product Z to cart, checked out', 'Total sales: $15000', 'Average page load time: 2.4 seconds, Conversion rate: 3.9%');
+
+select * from Customer;
+select *from _Transaction;
+select *from _Order;
+Select*from Seller;
+select*from Inventory;
+select*from CustomerInteraction;
+select*from SellerInteraction;
+select*from Analytics;
+
+SELECT * FROM Product WHERE StockLevel > 0;
+SELECT * FROM CustomerInteraction WHERE CustomerID = 1;
+SELECT COUNT(*) AS TotalOrders FROM _Order;
+SELECT AVG(TotalCost) AS AverageTotalCost FROM _Order;
+SELECT SUM(Amount) AS TotalSalesAmount FROM Transaction;
+SELECT _Order.OrderID, _Order.OrderDate, _Order.TotalCost, _Order.OrderStatus, Customer.Name AS CustomerName, Customer.Email AS CustomerEmail
+FROM _Order
+JOIN Customer ON _Order.CustomerID = Customer.CustomerID;
+
+SELECT Customer.CustomerID, Customer.Name, SUM(Transaction.Amount) AS TotalSalesAmount
+FROM Customer
+LEFT JOIN _Order ON Customer.CustomerID = _Order.CustomerID
+LEFT JOIN Transaction ON _Order.OrderID = Transaction.OrderID
+GROUP BY Customer.CustomerID, Customer.Name;
+
+
+SELECT Product.Name, SUM(OrderProduct.Quantity) AS TotalQuantitySold
+FROM Product
+JOIN OrderProduct ON Product.ProductID = OrderProduct.ProductID
+GROUP BY Product.ProductID, Product.Name
+ORDER BY TotalQuantitySold DESC;
+
